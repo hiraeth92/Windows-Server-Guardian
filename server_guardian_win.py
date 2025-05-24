@@ -13,7 +13,7 @@ load_dotenv()  # 載入 .env 環境變數
 
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")      # 寄件郵箱帳號
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")    # 寄件郵箱密碼
-TO_EMAIL = "bossun113@gmail.com"                 # 收件郵箱地址
+TO_EMAIL = "自己的帳號@gmail.com"                 # 收件郵箱地址
 
 # 系統資源使用率警戒門檻設定
 CPU_THRESHOLD = 80
