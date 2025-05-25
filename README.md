@@ -31,5 +31,5 @@ Ideal for system reliability monitoring, IT operations, and automated alerting s
 ### 1️⃣ 下載專案 Clone the Repository
 
 ```bash
-git clone https://github.com/你的帳號/Windows-Server-Guardian.git
+git clone https://github.com/hiraeth92/Windows-Server-Guardian.git
 cd Windows-Server-Guardian
