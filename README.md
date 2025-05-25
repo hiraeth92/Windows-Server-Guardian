@@ -24,12 +24,3 @@ Ideal for system reliability monitoring, IT operations, and automated alerting s
 - ✅ 具備資源與關鍵字過濾機制  
 - ✅ 使用 `.env` 檔案安全管理帳號密碼  
 
----
-
-## 📦 安裝說明 | Installation
-
-### 1️⃣ 下載專案 Clone the Repository
-
-```bash
-git clone https://github.com/hiraeth92/Windows-Server-Guardian.git
-cd Windows-Server-Guardian
