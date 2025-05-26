@@ -22,5 +22,9 @@ Ideal for system reliability monitoring, IT operations, and automated alerting s
 - ✅ 每五分鐘自動檢查系統錯誤與警告日誌  
 - ✅ Email 告警通知（自動寄送摘要）  
 - ✅ 具備資源與關鍵字過濾機制  
-- ✅ 使用 `.env` 檔案安全管理帳號密碼  
+- ✅ 使用 `.env` 檔案安全管理帳號密碼
+  
+---
 
+📂 GitHub 專案  
+｜[📘 專案說明（Notion）](https://www.notion.so/Windows-Server-Guardian-1ff41100419980f08512c8f2ec28c639?pvs=4))
