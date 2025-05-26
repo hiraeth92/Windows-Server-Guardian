@@ -26,5 +26,5 @@ Ideal for system reliability monitoring, IT operations, and automated alerting s
   
 ---
 
-📂 GitHub 專案  
-｜[📘 專案說明（Notion）](https://www.notion.so/Windows-Server-Guardian-1ff41100419980f08512c8f2ec28c639?pvs=4))
+📂   
+([📘 專案說明（Notion）](https://www.notion.so/Windows-Server-Guardian-1ff41100419980f08512c8f2ec28c639?pvs=4))
