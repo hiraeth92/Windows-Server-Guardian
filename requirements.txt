@@ -1,0 +1,5 @@
+psutil
+GPUtil
+smtplib
+win32evtlog
+dotenv
