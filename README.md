@@ -23,7 +23,7 @@ Ideal for enhancing server reliability, optimizing IT operations, and implementi
 * ✅ 自動化系統錯誤與警告日誌偵測（如 error、fail、critical）
 * ✅ 異常狀況 Email 即時告警，附自動生成摘要報告
 * ✅ 支援自訂過濾條件，排除非關鍵訊息
-* ✅ 利用 `.env` 檔案安全管理敏感設定與憑證
+* ✅ 利用 .env 檔案安全管理敏感設定與憑證
 
 ---
 
