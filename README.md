@@ -22,7 +22,8 @@ Ideal for system reliability monitoring, IT operations, and automated alerting s
 - ✅ 每五分鐘自動檢查系統錯誤與警告日誌  
 - ✅ Email 告警通知（自動寄送摘要）  
 - ✅ 具備資源與關鍵字過濾機制  
-- ✅ 使用 `.env` 檔案安全管理帳號密碼
+- ✅ 使用 .env 檔案安全管理帳號密碼
+- ✅ 多執行緒架構，支援不同時間間隔的資源監控與日誌掃描
   
 ---
 
