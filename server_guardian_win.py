@@ -52,35 +52,35 @@ def check_windows_logs(server='localhost', minutes=5):
     log_type = 'System'  # 指定讀取的日誌類型為系統日誌
     flags = win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ  # 從最新讀起，依序讀取
     hand = win32evtlog.OpenEventLog(server, log_type)  # 開啟日誌檔案
-    alerts = []  # 儲存警告訊息列表
+    alerts = []  # 空清單儲存警告訊息列表
     now = datetime.now()
     time_limit = now - timedelta(minutes=minutes)  # 設定時間門檻（只讀取這段時間內的）
 
     while True:
-        events = win32evtlog.ReadEventLog(hand, flags, 0)  # 讀取事件日誌
-        if not events:
+        events = win32evtlog.ReadEventLog(hand, flags, 0)  # 讀取事件日誌每次讀一批事件，若讀不到（空的），後面會跳出迴圈
+        if not events:       #如果讀不到任何事件，就跳出 while 迴圈，結束讀取
             break
-        for event in events:
+        for event in events:         #對每一筆事件逐一處理
             try:
-                event_time = datetime.strptime(event.TimeGenerated.Format(), '%m/%d/%Y %H:%M:%S')  # 轉換時間格式
-            except Exception:
-                continue
+                event_time = datetime.strptime(event.TimeGenerated.Format(), '%m/%d/%Y %H:%M:%S')  # strptime轉換時間格式轉換成 Python 型別。
+            except Exception:     #如果格式錯誤轉換失敗就跳過這筆
+                continue         
             if event_time < time_limit:
                 win32evtlog.CloseEventLog(hand)  # 超過時間門檻就停止
-                return alerts
-            if event.EventType in [win32evtlog.EVENTLOG_ERROR_TYPE, win32evtlog.EVENTLOG_WARNING_TYPE]:
-                source = str(event.SourceName)
+                return alerts                    #直接回傳目前蒐集到的警告清單
+            if event.EventType in [win32evtlog.EVENTLOG_ERROR_TYPE, win32evtlog.EVENTLOG_WARNING_TYPE]:      #只處理「錯誤」或「警告」類型的事件
+                source = str(event.SourceName)  #事件來源（例如某個服務或系統元件）
                 try:
-                    msg = win32evtlog.FormatMessage(event)
+                    msg = win32evtlog.FormatMessage(event)  #嘗試取得事件說明文字
                 except:
-                    msg = "無法取得訊息"
-                full_msg = f"[{event_time.strftime('%Y-%m-%d %H:%M:%S')}] {source}: {msg.strip()}"
-                if (any(p.search(full_msg) for p in ALERT_KEYWORDS) and
-                    not any(p.search(full_msg) for p in SKIP_KEYWORDS)):
+                    msg = "無法取得訊息"   #若失敗則給預設訊息
+                full_msg = f"[{event_time.strftime('%Y-%m-%d %H:%M:%S')}] {source}: {msg.strip()}"       #組合成完整訊息格式
+                if (any(p.search(full_msg) for p in ALERT_KEYWORDS) and      #偵測的關鍵字
+                    not any(p.search(full_msg) for p in SKIP_KEYWORDS)):     #排除關鍵字
                     alerts.append(full_msg)  # 加入符合條件的警告訊息
 
-    win32evtlog.CloseEventLog(hand)
-    return alerts
+    win32evtlog.CloseEventLog(hand)    #迴圈結束後記得關閉 log
+    return alerts     #回傳符合條件的錯誤警告訊息列表
 
 def get_system_status(prev_net):
     """
@@ -127,20 +127,23 @@ def monitor():
         log_thread_result = []  # 儲存日誌結果的容器
         def read_log():
             log_thread_result.extend(check_windows_logs(minutes=5))  # 執行日誌讀取並存入結果
-        log_thread = threading.Thread(target=read_log)  # 建立執行緒物件
-        log_thread.start()  # 啟動執行緒
-        log_thread.join()  # 等待子執行緒完成
+        log_thread = threading.Thread(target=read_log)  # 建立執行緒物件，指定它要執行 read_log() 這個函式，threading.Thread(...) 是 Python 用來開子執行緒的方式
+        log_thread.start()  # 啟動執行緒讓它去後台執行 read_log() 的程式，主程式不會被這段卡住，可以繼續做其他事（不會阻塞）
+        log_thread.join()  # 等待子執行緒完成，主程式等日誌讀取完才繼續，就加這行（這裡有等）
+        #這樣寫可以讓你未來做「非同步」、「邊抓資料邊跑其他邏輯」時不會卡住主線程。
 
-        if log_thread_result:
+        
+        if log_thread_result:    #有資料（代表剛剛讀到有錯誤／警告日誌），就把這些資訊整理成一段文字加入 alerts
             alerts.append("系統日誌錯誤或警告：\n" + "\n".join(log_thread_result))
 
-        if alerts:
+        if alerts:    #alerts 有任何內容，就逐筆印出
             print("⚠️ 發現警告／錯誤：")
             for a in alerts:
                 print(a)  # 輸出警告訊息
-            alert_cache.extend(alerts)  # 加入暫存
+            alert_cache.extend(alerts)  # 同時把這些內容放入 alert_cache，代表「這些訊息準備寄出」
 
-        if time.time() - last_sent_time > EMAIL_INTERVAL and alert_cache:
+        if time.time() - last_sent_time > EMAIL_INTERVAL and alert_cache:    #如果「距離上次寄信時間」超過預設間隔5分鐘，且 alert_cache 裡有警告，就準備寄信
+            #把所有警告整理成一封信，開一個執行緒去寄信，不阻塞主流程。
             alert_text = "\n".join(alert_cache)  # 組合警告文字
             email_thread = threading.Thread(  # 建立子執行緒寄信
                 target=send_email,
@@ -150,10 +153,10 @@ def monitor():
             last_sent_time = time.time()  # 更新上次寄信時間
             alert_cache.clear()  # 清除已寄出的警告內容
 
-        time.sleep(10)  # 每 10 秒檢查一次
+        time.sleep(10)  # 每 10 秒檢查一次是否有新錯誤或警告
 
 if __name__ == "__main__":
     try:
         monitor()  # 啟動監控主程式
-    except KeyboardInterrupt:
-        print("程式中斷，結束監控")  # 捕捉 Ctrl+C 結束程式
+    except KeyboardInterrupt:    # 捕捉 Ctrl+C 結束程式
+        print("程式中斷，結束監控") 
